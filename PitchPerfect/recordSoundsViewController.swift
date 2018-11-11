@@ -18,15 +18,11 @@ class recordSoundsViewController : UIViewController, AVAudioRecorderDelegate {
     
     //MARK: Configuring UI Playing and not playing states
     func configureUI(isRecording:Bool){
-        if isRecording{
-            RecordinLabel.text = "Recording in progress..."
-            stopRecordingButton.isEnabled = true
-            recordButton.isEnabled = false
-        }else{
-            recordButton.isEnabled = true
-            stopRecordingButton.isEnabled=false
-            RecordinLabel.text = "Tap to record"
-        }
+        
+        recordButton.isEnabled = !isRecording
+        stopRecordingButton.isEnabled = isRecording
+        RecordinLabel.text = isRecording ? "Recording in progress...":"Tap to record"
+        
     }
     
     override func viewDidLoad() {
@@ -64,9 +60,10 @@ class recordSoundsViewController : UIViewController, AVAudioRecorderDelegate {
     }
    
     // MARK: - Audio Recorder Delegate
+    let identifierStr = "stopRecording"
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         if flag{
-            performSegue(withIdentifier: "stopRecording", sender: audioRecorder.url)
+            performSegue(withIdentifier: identifierStr, sender: audioRecorder.url)
         }else{
             print("recording was not successful")
             // to be replaced by alert to show message in the app
@@ -75,7 +72,7 @@ class recordSoundsViewController : UIViewController, AVAudioRecorderDelegate {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "stopRecording" {
+        if segue.identifier == identifierStr {
             let playSoundsVC = segue.destination as! PlaySoundsViewController
             let recordedAudioURL = sender as! URL
             playSoundsVC.recorderAudioURL = recordedAudioURL
